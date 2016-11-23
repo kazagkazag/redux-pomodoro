@@ -1,6 +1,6 @@
-# React Pomodoro
+# Redux Pomodoro
 
-Simple demonstration of the react application built on top of create-react-app.
+Simple demonstration of the react & redux application built on top of create-react-app.
 
 # How it works?
 
@@ -12,6 +12,8 @@ Your should open localhost:9000 in browser to see our application. You can adjus
 work and break and start counting. That's all.
 
 To implement demo run `npm start` and start coding.
+
+To run REST server use `npm run rest-mock`.
 
 # Pomodoro technique
 

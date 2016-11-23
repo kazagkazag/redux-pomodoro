@@ -5,10 +5,6 @@ import Counter from "./Counter";
 import ProgressBar from "./ProgressBar";
 import Config from "./Config";
 
-import { connect } from 'react-redux'
-
-import * as actions from "./actions";
-
 class App extends Component {
 
     constructor(props) {
@@ -17,16 +13,16 @@ class App extends Component {
         this.state = {
             isRunning: false,
             time: 0,
-            isTickingForWork: true
+            isTickingForWork: true,
+            workDuration: 10,
+            breakDuration: 3
         };
 
         this.timeout = null;
 
+        this.changeBreakDuration = this.changeBreakDuration.bind(this);
+        this.changeWorkDuration = this.changeWorkDuration.bind(this);
         this.toggleTimer = this.toggleTimer.bind(this);
-    }
-
-    componentDidMount() {
-        this.props.fetchDefaults();
     }
 
     toggleTimer() {
@@ -39,6 +35,18 @@ class App extends Component {
         });
     }
 
+    changeWorkDuration(minutes) {
+        this.setState({
+            workDuration: parseInt(minutes, 10)
+        });
+    }
+
+    changeBreakDuration(minutes) {
+        this.setState({
+            breakDuration: parseInt(minutes, 10)
+        });
+    }
+
     componentDidUpdate() {
         if(this.state.isRunning) {
             this.tickIfNeeded();
@@ -46,8 +54,8 @@ class App extends Component {
     }
 
     tickIfNeeded() {
-        const shouldTickForWork = this.state.isTickingForWork && this.state.time < this.props.workDuration * 60;
-        const shouldTickForBreak = !this.state.isTickingForWork && this.state.time < this.props.breakDuration * 60;
+        const shouldTickForWork = this.state.isTickingForWork && this.state.time < this.state.workDuration * 60;
+        const shouldTickForBreak = !this.state.isTickingForWork && this.state.time < this.state.breakDuration * 60;
 
         if(shouldTickForWork || shouldTickForBreak) {
             this.tick();
@@ -75,7 +83,7 @@ class App extends Component {
         return this.state.isRunning ? (
             <ProgressBar
                 time={this.state.time}
-                max={this.state.isTickingForWork ? this.props.workDuration : this.props.breakDuration}
+                max={this.state.isTickingForWork ? this.state.workDuration : this.state.breakDuration}
                 isTickingForWork={this.state.isTickingForWork}
             />
         ) : null;
@@ -84,10 +92,10 @@ class App extends Component {
     renderConfig() {
         return !this.state.isRunning ? (
             <Config
-                workDuration={this.props.workDuration}
-                breakDuration={this.props.breakDuration}
-                changeWorkDuration={this.props.changeWorkDuration}
-                changeBreakDuration={this.props.changeBreakDuration}
+                workDuration={this.state.workDuration}
+                breakDuration={this.state.breakDuration}
+                changeWorkDuration={this.changeWorkDuration}
+                changeBreakDuration={this.changeBreakDuration}
             />
         ) : null;
     }
@@ -107,29 +115,4 @@ class App extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
-    return {
-        workDuration: parseInt(state.workDuration, 10),
-        breakDuration: parseInt(state.breakDuration, 10),
-        defaults: state.defaults
-    }
-};
-
-const mapDispatchToProps = (dispatch) => {
-    return {
-        changeWorkDuration(duration) {
-            dispatch(actions.setWorkDuration(parseInt(duration, 10)))
-        },
-        changeBreakDuration(duration) {
-            dispatch(actions.setBreakDuration(parseInt(duration, 10)))
-        },
-        fetchDefaults() {
-            dispatch(actions.fetchDefaults());
-        }
-    }
-};
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(App);
+export default App;
